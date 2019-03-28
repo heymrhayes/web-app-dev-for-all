@@ -1,0 +1,16 @@
+/* note that in a css file, no HTML tags are present */
+body {
+	font-family: Verdana, Arial, sans-serif;
+	background-color: ivory;
+}
+
+div {
+	border: solid 1px black;
+	padding: 5px;
+	margin: 5px;
+	background-color: white;
+}
+
+#special {
+	background-color: #EEEEEE;
+}
