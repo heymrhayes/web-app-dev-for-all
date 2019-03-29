@@ -8,7 +8,10 @@ Bootstrap (https://getbootstrap.com/) is an open-source RWD project from Twitter
 
 ## Examples in this project
 
-[bootstrap_basic.html](./ bootstrap_basic.html) is a basic Bootstrap page.
+[bootstrap_basic.html](./bootstrap_basic.html) is a basic Bootstrap page, with all the necessary file includes and a few components.
+
+[bootstrap_intermediate.html](./bootstrap_intermediate.html) includes a navbar, carousel and card components, showing responsive behavior as you resize the screen.
+
 
 
 
