@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Data DOM Update</title>
+</head>
+
+<body>
+<h1>Data - Update the DOM</h1>
+<p>This page makes an AJAX call and updates the <a href="https://bitsofco.de/what-exactly-is-the-dom/">DOM</a> in a simple way. The text below the line is added programmatically when the data is returned. </p><hr>
+
+
+
+	
+	
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+	<script>
+		// the url
+		var apiEndpoint = "https://data.cityofchicago.org/resource/85ca-t3if.json";
+		
+		
+		$.get(apiEndpoint, 
+			// callback function; executes when request is resolved
+			function(response) {
+				var records = response;
+				
+				// loop through the records
+				$.each(records, 
+					// function to execute for each record;
+					//	i is the index position in the list, v is the value at that position
+					function(i,v) {
+						// append data to DOM body element
+						$("body").append(v.rd_no + "<br>");
+						
+					});
+			
+				
+				
+			});
+	</script>
+
+</body>
+
+</html>

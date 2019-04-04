@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Data Basic</title>
+</head>
+
+<body>
+<h1>Data - Basic AJAX call</h1>
+<p>This page makes an <a href="https://skillcrush.com/2018/04/26/what-is-ajax/">AJAX</a> call to the City of Chicago Data Portal to retrieve information related to car crashes.  The Portal includes an <a href="https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82">API</a> that retrieves the data you request and returns it as a JavaScript object that we can work with in our programs. </p>
+<p>Script on this page makes the request and logs the response to the console.  To see the data, open your browser's developer tools to the JavaScript console.  By default, the API limits the response to 1000 records, but with more knowledge of the API, we can override that.</p>
+
+<p>The home page for the dataset is at <a href=" https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if/">https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if/</a></p>
+
+
+
+	
+	
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+	<script>
+		// the url
+		var apiEndpoint = "https://data.cityofchicago.org/resource/85ca-t3if.json";
+		
+		
+		$.get(apiEndpoint, 
+			// callback function; executes when request is resolved
+			function(response) {
+				var records = response;
+				console.log(records);
+			});
+	</script>
+
+</body>
+
+</html>
