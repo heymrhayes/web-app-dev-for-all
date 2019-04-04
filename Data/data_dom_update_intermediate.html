@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Data DOM Update Intermediate</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	
+	<style>
+		.template {display:none;}
+		.col-sm-6 {margin-bottom: 1rem;}
+		body {padding: 1rem;}
+	</style>
+</head>
+
+<body>
+	<h1>Data - Intermediate DOM Update</h1>
+	<p>On this page, we update the DOM in a more sophisticated way, using the Bootstrap <strong>Card</strong> component (<a href="https://getbootstrap.com/docs/4.3/components/card/">https://getbootstrap.com/docs/4.3/components/card/</a>.) Note the responsiveness as you resize your browser.
+	</p>
+	<hr>
+	<!--container for the cards-->
+	<div class="container-fluid">
+		<div class="row">
+			<div class="template col-sm-6">
+				<div class="card">
+					<div class="card-header">
+						Featured
+					</div>
+					<div class="card-body">
+						<h5 class="card-title">Card title</h5>
+						<h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+	<script>
+		// the url
+		var apiEndpoint = "https://data.cityofchicago.org/resource/85ca-t3if.json?$limit=10";
+
+
+		$.get(apiEndpoint,
+			// callback function; executes when request is resolved
+			function(response) {
+				var records = response;
+				var clone;
+				// loop through the records
+				$.each(records,
+					// function to execute for each record;
+					//	i is the index position in the list, v is the value at that position
+					function(i, v) {
+						// clone the template
+						clone = $(".template").clone();
+
+						// find and update clone elements with content from the data
+						clone.find(".card-header").text(v.rd_no + ": " + v.report_type);
+						clone.find(".card-title").text(v.crash_type);
+						clone.find(".card-subtitle").text(v.crash_date);
+						clone.find(".card-text").html("Police beat: " + v.beat_of_occurrence + "<br>" + "Primary cause: " + v.prim_contributory_cause);
+						
+						// remove the template class from the clone
+						clone.removeClass("template");
+						
+						// add clone to the row container
+						$(".row").append(clone);
+
+					});
+
+
+
+			});
+	</script>
+
+</body>
+
+</html>

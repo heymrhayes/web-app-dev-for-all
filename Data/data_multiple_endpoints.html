@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Data Multiple Endpoints</title>
+</head>
+
+<body>
+<h1>Data - Multiple Endpoints</h1>
+<p>Each data API can choose to structure the response data differently, so you need to read the documentation and/or examine the actual response data to understand how to reference the records.</p>
+<p>Script on this page makes calls to some different data APIs and displays the results in the JavaScript console.  Take a look and note how each response has a different structure.</p>
+<p>And look at the page source to see the URLs for the endpoints and the documentation.</p>
+
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+	<script>
+		// array of APIs to call
+		var apis = 
+		[{ 
+			title: "City of Chicago Traffic Crash Data",
+			endpoint: "https://data.cityofchicago.org/resource/85ca-t3if.json?$limit=50",
+			documentation: "https://dev.socrata.com/foundry/data.cityofchicago.org/85ca-t3if"			
+		},
+		{ 
+			title: "NYTimes Article Search",
+			endpoint: "https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=l4TaX4wafpJ0237rMRRx3MSEFSoeWfAF",
+			documentation: "https://developer.nytimes.com/docs/articlesearch-product/1/overview"
+		},
+		{ 
+			title: "NASA APOD (Astronomy Picture of the Day)",
+			endpoint: "https://api.nasa.gov/planetary/apod?api_key=NNKOjkoul8n1CH18TWA9gwngW1s1SmjESPjNoUFo",
+			documentation: "https://api.nasa.gov/api.html#apod"
+		}			
+		];
+
+		
+		$.each(apis, function(i,v) {
+			$.get(v.endpoint, 
+				// callback function; executes when request is resolved
+				function(response) {
+					console.log("**********************");
+					console.log("Title: ", v.title);
+					console.log(response);
+				});			
+		})
+
+	</script>
+
+</body>
+
+</html>
