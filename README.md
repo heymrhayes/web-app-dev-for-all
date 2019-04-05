@@ -6,6 +6,6 @@ This project includes several examples.
 
 [UI Intermediate](./UI-Intermediate)
 
-[Working with Data APIs] (./Data)
+[Working with Data APIs](./Data)
 
-[Data Visualization] (./Data-Visualization)
+[Data Visualization](./Data-Visualization)
