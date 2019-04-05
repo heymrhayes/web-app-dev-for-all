@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Data Viz - Map Filtered Data</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+	<style>
+		.template {
+			display: none;
+		}
+
+		.col-sm-6 {
+			margin-bottom: 1rem;
+		}
+
+		body {
+			padding: 1rem;
+		}
+
+		#map-container {
+			height: 500px;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Data - Form to Filter Request</h1>
+	<p>On this page, we include a Google Map, using the Google Maps API. <a href="https://developers.google.com/maps/documentation/javascript/tutorial">https://developers.google.com/maps/documentation/javascript/tutorial</a></p>
+	<p>We create a div to hold the map, and when the data comes back, we create markers using the latitude and longitude and create info windows.</p>
+
+	<hr>
+	<p>Make your selections to search the Chicago Traffic Crash data.</p>
+	<form>
+		<!-- using the Bootstrap form-row and form-group w/column for layout -->
+		<div class="form-row">
+			<div class="form-group col-md-4">
+				<label for="beatNumber">Beat Number</label>
+				<input type="number" class="form-control" id="beatNumber" placeholder="Enter the desired beat number (133 is a valid value for testing)">
+			</div>
+			<div class="form-group col-md-4">
+				<label for="crashType">Select the crash type</label>
+				<select class="form-control" id="crashType">
+		      <option>Any Type</option>
+		    </select>
+			</div>
+			<div class="form-group col-md-4">
+				<label for="limit">Max records</label>
+				<select class="form-control" id="limit">
+			      <option>All records</option>
+			      <option selected>1</option>
+			      <option >10</option>
+			      <option >100</option>
+			    </select>
+			</div>
+		</div>
+		<button type="button" class="btn btn-primary" disabled>Search</button>
+
+
+	</form>
+	<hr>
+
+	<!--container for the cards-->
+	<div class="container-fluid">
+		<div id="numResults" class="h3"></div>
+		<div id="results" class="row">
+			<div class="template col-sm-6 card-container">
+				<div class="card">
+					<div class="card-header">
+						Featured
+					</div>
+					<div class="card-body">
+						<h5 class="card-title">Card title</h5>
+						<h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- container for the map-->
+	<div id="map-container">
+
+	</div>
+
+
+
+
+
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+
+
+	<!-- for ease while learning, we include the script here, forcing the scripts to wait until this is loaded; 
+		to force the script to wait, we'll wrap all the script in a $(document).ready event handler. 
+		In a production product, we would want to manage the load timing -->
+
+
+	<!-- and please create your own Google Maps API key; 
+		mine will stop working at some point--> 
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBcoqcxlIFUx3L4BlLrz0KR4O65436fKsY">
+	</script>
+
+
+
+
+	<script>
+		// global vars
+		var mapObject, infoWindows = [], markers = [];
+		
+		
+
+		var crashTypesURL = "https://data.cityofchicago.org/resource/85ca-t3if.json?$query=select%20distinct%20crash_type%20order%20by%20crash_type"
+
+		// the url to pull the data
+		var apiEndpoint = "https://data.cityofchicago.org/resource/85ca-t3if.json?";
+
+
+		$(document).ready(function() {
+
+
+
+
+			// get the types and update the select control
+			$.get(crashTypesURL, function(response) {
+				var records = response;
+				$.each(records, function(i, v) {
+					var option = $("<option>");
+					option.text(v.crash_type);
+					$("#crashType").append(option);
+				});
+				$("button").attr("disabled", false);
+
+			});
+
+
+			// event handler for the button
+			$("button").on("click", function(e) {
+
+				// clear out any prior results, but not the template
+				$(".card-container").not(".template").remove();
+
+
+				// need to create the filter url each time
+				var filterURL = apiEndpoint;
+
+				// read the form elements and append URL parameters, as needed
+				if ($("#crashType").val() != "Any Type") {
+					filterURL += "&crash_type=" + $("#crashType").val();
+				}
+
+				if ($("#beatNumber").val() != "") {
+					filterURL += "&beat_of_occurrence=" + $("#beatNumber").val();
+				}
+				
+				if ($("#limit").val() != "All records") {
+					filterURL += "&$limit=" + $("#limit").val();
+				}
+
+
+
+				$.get(filterURL,
+					// callback function; executes when request is resolved
+					function(response) {
+
+						var records = response;
+						var clone;
+
+						// let the user know how many records were returned
+						$("#numResults").text("Number of records found: " + response.length);
+
+						// loop through the records
+						$.each(records,
+							// function to execute for each record;
+							//	i is the index position in the list, v is the value at that position
+							function(i, v) {
+								// clone the template
+								clone = $(".template").clone();
+
+								// we'll give each one an id attribute 
+								//   this will help identify each one later
+								clone.attr("id", v.rd_no);
+
+
+								// find and update clone elements with content from the data
+								clone.find(".card-header").text(v.rd_no + ": " + v.report_type);
+								clone.find(".card-title").text(v.crash_type);
+								clone.find(".card-subtitle").text(v.crash_date);
+								clone.find(".card-text").html("Police beat: " + v.beat_of_occurrence + "<br>" + "Primary cause: " + v.prim_contributory_cause);
+
+								// remove the template class from the clone
+								clone.removeClass("template");
+
+								// add clone to the row container
+								$(".row").append(clone);
+
+							});
+
+						// after we loop through the records and update the DOM
+						//  we create the map, loop through them again to create the markers
+						//  (we're separating these loops here for ease of understanding)
+
+						// we need to center the map somewhere;  
+						//   we can use the first returned record as "close enough"
+						var latLng = {
+								lat: parseFloat(records[0].latitude),
+								lng: parseFloat(records[0].longitude)
+							};
+						
+						
+						// if not yet defined, create the mapObject
+						
+						if (typeof(mapObject) == "undefined") {
+							mapObject = new google.maps.Map(document.getElementById('map-container'), {
+						          zoom: 12,
+						          center: latLng
+						        });
+						} else {
+							
+							// recenter it
+							mapObject.setCenter(latLng);
+							
+						}
+					        
+					    
+					    // we need to remove any existing markers
+					    
+					    $.each(markers, function(i,v) {
+					    	// remove the map reference
+					    	v.setMap(null);
+					    });
+					    
+					    // we don't need them, so clear the array
+					    markers = [];
+					    
+					    // and clear the infoWindows
+					    infoWindows = [];
+
+						$.each(records, function(i, v) {
+							// for each record, we'll create an object using
+							//   the lat/lng properties, and use that to create
+							//   a marker
+
+							//  The Maps API expects floats, so convert the strings
+							latLng = {
+								lat: parseFloat(v.latitude),
+								lng: parseFloat(v.longitude)
+							};
+
+							var marker = new google.maps.Marker({
+								position: latLng,
+								map: mapObject,
+								title: v.rd_no
+							});
+							
+							// add each new marker to the array
+							markers.push(marker);
+							
+							// create an info window for each;
+							//  use the card html as the content
+							
+							var infoWindow = new google.maps.InfoWindow({
+					          content: $("#" + v.rd_no).html()
+					        });
+					        
+					        infoWindows.push(infoWindow);
+					        
+					        //  and hook up the event handler
+					         marker.addListener('click', function() {
+					          infoWindow.open(mapObject, marker);
+					        });
+
+						});
+
+						$("#map-container").show();
+
+					});
+
+			});
+
+		});
+	</script>
+
+</body>
+
+</html>

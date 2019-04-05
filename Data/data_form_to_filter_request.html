@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Data DOM Update Intermediate</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	
+	<style>
+		.template {display:none;}
+		.col-sm-6 {margin-bottom: 1rem;}
+		body {padding: 1rem;}
+	</style>
+</head>
+
+<body>
+	<h1>Data - Form to Filter Request</h1>
+	<p>On this page, form elements allow the user to filter the data.  When the button is pressed, the script reads the element values which are used to append a <strong>URL parameter</strong> to the endpoint.  The API will use that passed value to filter the records to be returned.
+	</p>
+	<p>Most of the time, users will not know the correct text to type in for certain values, so we want our interfaces to be more user-friendly.  Because we can't expect a user to know the proper "Crash Type" values, we first make an AJAX call to get those unique values, and we update the select (dropdown) control with those values. When that's done, we enable the search button.</p>
+	<p>On each search, we clear out the previous display.</p>
+	<hr>
+	<p>Make your selections to search the Chicago Traffic Crash data.</p>
+	<form>
+		<!-- using the Bootstrap form-row and form-group w/column for layout -->
+		<div class="form-row">
+		  <div class="form-group col-md-6">
+		    <label for="beatNumber">Beat Number</label>
+		    <input type="number" class="form-control" id="beatNumber" placeholder="Enter the desired beat number (133 is a valid value for testing)">
+		  </div>
+		  <div class="form-group col-md-6">
+		    <label for="crashType">Select the crash type</label>
+		    <select class="form-control" id="crashType">
+		      <option>Any Type</option>
+		    </select>
+		  </div>
+		</div>
+		   <button type="button" class="btn btn-primary" disabled>Search</button>
+
+	
+		</form>
+	<hr>
+	
+	<!--container for the cards-->
+	<div class="container-fluid">
+		<div id="numResults" class="h3"></div>
+		<div id="results" class="row">
+			<div class="template col-sm-6 card-container">
+				<div class="card">
+					<div class="card-header">
+						Featured
+					</div>
+					<div class="card-body">
+						<h5 class="card-title">Card title</h5>
+						<h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+	<script>
+		var crashTypesURL = "https://data.cityofchicago.org/resource/85ca-t3if.json?$query=select%20distinct%20crash_type%20order%20by%20crash_type"
+
+		
+		// the url to pull the data
+		var apiEndpoint = "https://data.cityofchicago.org/resource/85ca-t3if.json?";
+		
+
+		// get the types and update the select control
+		$.get(crashTypesURL, function(response) {
+			var records = response;
+			$.each(records, function(i,v) {
+				var option = $("<option>");
+				option.text(v.crash_type);
+				$("#crashType").append(option);
+			});
+			$("button").attr("disabled", false);
+			
+		});
+
+
+		// event handler for the button
+		$("button").on("click", function(e) {
+			
+			// clear out any prior results, but not the template
+			$(".card-container").not(".template").remove();
+			
+			
+			// need to create the filter url each time
+			var filterURL = apiEndpoint;
+			
+			// read the form elements and append URL parameters, as needed
+			if ($("#crashType").val() != "Any Type") {
+				filterURL += "&crash_type=" + $("#crashType").val();
+			}
+			
+			if ($("#beatNumber").val() != "") {
+				filterURL += "&beat_of_occurrence=" + $("#beatNumber").val();
+			}
+			
+			
+			
+			$.get(filterURL,
+				// callback function; executes when request is resolved
+				function(response) {
+
+					var records = response;
+					var clone;
+					
+					// let the user know how many records were returned
+					$("#numResults").text("Number of records found: " + response.length);
+					
+					
+					// loop through the records
+					$.each(records,
+						// function to execute for each record;
+						//	i is the index position in the list, v is the value at that position
+						function(i, v) {
+							// clone the template
+							clone = $(".template").clone();
+	
+							// find and update clone elements with content from the data
+							clone.find(".card-header").text(v.rd_no + ": " + v.report_type);
+							clone.find(".card-title").text(v.crash_type);
+							clone.find(".card-subtitle").text(v.crash_date);
+							clone.find(".card-text").html("Police beat: " + v.beat_of_occurrence + "<br>" + "Primary cause: " + v.prim_contributory_cause);
+							
+							// remove the template class from the clone
+							clone.removeClass("template");
+							
+							// add clone to the row container
+							$(".row").append(clone);
+	
+						});
+				});
+
+
+
+			
+			
+		});
+
+
+	</script>
+
+</body>
+
+</html>
