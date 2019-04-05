@@ -11,4 +11,4 @@ This project includes several examples.
 [Data Visualization](./Data-Visualization)
 
 You can access the GitHub repo directly at 
-https://github.com/heymrhayes/web-app-dev-for-all
+(https://github.com/heymrhayes/web-app-dev-for-all)
