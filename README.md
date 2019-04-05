@@ -9,3 +9,6 @@ This project includes several examples.
 [Working with Data APIs](./Data)
 
 [Data Visualization](./Data-Visualization)
+
+You can access the GitHub repo directly at 
+https://github.com/heymrhayes/web-app-dev-for-all
